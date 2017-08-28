@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using TPPCommon.Logging;
+using TPPCommon.Persistence;
 
 namespace BidCat
 {
@@ -20,10 +21,12 @@ namespace BidCat
 
         protected HashSet<ReservedMoneyChecker> ReservedMoneyCheckers = new HashSet<ReservedMoneyChecker>();
         protected TPPLoggerBase Logger;
+        protected IPersistence Persistence;
 
-        public Bank(TPPLoggerBase logger)
+        public Bank(TPPLoggerBase logger, IPersistence persistence)
         {
             this.Logger = logger;
+            this.Persistence = persistence;
         }
 
         /// <summary>
@@ -55,7 +58,7 @@ namespace BidCat
         }
 
         /// <summary>
-        /// Gets the total amount of reserved money for a user.
+        /// Get the total amount of reserved money for a user.
         /// Reserved money is money that is reserved "in-memory" and not yet committed to storage.
         /// Reserved money is tracked by the caller by registering a reserved money tracker with this Bank instance.
         /// </summary>
@@ -67,7 +70,7 @@ namespace BidCat
         }
 
         /// <summary>
-        /// Gets a user's total money.
+        /// Get a user's total money.
         /// </summary>
         /// <param name="userId">user id</param>
         /// <returns>user's total money</returns>
@@ -77,20 +80,46 @@ namespace BidCat
         }
 
         /// <summary>
-        /// Gets the amount of money available to a user.
+        /// Get the amount of money available to a user.
         /// 
         /// Available money is the total amount of money that the user has minus his reserved money. It is
         /// the amount of money currently available for use.
         /// </summary>
-        /// <param name="userId"></param>
+        /// <param name="userId">user id</param>
         /// <returns></returns>
         public int GetAvailableMoney(string userId)
         {
             return this.GetTotalMoney(userId) - this.GetReservedMoney(userId);
         }
 
-        protected abstract int GetStoredMoney(string userId);
-        protected abstract void AdjustStoredMoney(string userId, int changeAmount);
-        protected abstract void RecordTransaction(Transaction);
+        /// <summary>
+        /// Adjust a user's money balance and make a record of it.
+        /// </summary>
+        /// <param name="userId">user id</param>
+        /// <param name="change">amount of money to adjust the balance by</param>
+        /// <returns>resulting transaction</returns>
+        public Transaction MakeTransaction(string userId, int change)
+        {
+            this.Logger.LogInfo($"Adjusting {userId}'s balance by {change}");
+
+            int oldBalance, newBalance;
+            if (this.GetStoredMoney(userId, out oldBalance) && this.AdjustStoredMoney(userId, change, out newBalance))
+            {
+                Transaction transaction = new Transaction(userId, change, DateTime.UtcNow, oldBalance, newBalance);
+                this.Logger.LogDebug($"Recording transaction: {transaction}");
+                this.RecordTransaction(transaction);
+
+                return transaction;
+            }
+            else
+            {
+                this.Logger.LogError($"Failed to complete transaction for user: {userId}, change: {change}");
+                return null;
+            }
+        }
+
+        protected abstract bool GetStoredMoney(string userId, out int storedMoney);
+        protected abstract bool AdjustStoredMoney(string userId, int change, out int resultMoney);
+        protected abstract void RecordTransaction(Transaction transaction);
     }
 }

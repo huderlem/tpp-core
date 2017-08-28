@@ -1,4 +1,6 @@
-﻿namespace TPPCommon.Models
+﻿using System.Reflection;
+
+namespace TPPCommon.Models
 {
     /// <summary>
     /// base class for all data models that might get handled by the persistency layer.

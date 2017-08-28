@@ -6,9 +6,19 @@ namespace TPPCommon.Models
     /// <summary>
     /// model for user objects.
     /// </summary>
-    [Table("users")]
+    [Table(TableName)]
     public class User : Model
     {
+        // Table name.
+        public const string TableName = "users";
+
+        // Field names.
+        public const string ProvidedIdField = "provided_id";
+        public const string ProvidedNameField = "provided_name";
+        public const string NameField = "name";
+        public const string SimpleNameField = "simple_name";
+        public const string MoneyField = "money";
+
         /// <summary>
         /// unique id of the user.
         /// </summary>
@@ -18,35 +28,42 @@ namespace TPPCommon.Models
         /// <summary>
         /// user id that the (chat) service, which this user originates from, provided.
         /// </summary>
-        [BsonElement("provided_id")]
+        [BsonElement(ProvidedIdField)]
         public readonly string ProvidedId;
         
         /// <summary>
         /// name of the (chat) service this user originates from.
         /// </summary>
-        [BsonElement("provided_name")]
+        [BsonElement(ProvidedNameField)]
         public readonly string ProvidedName;
         
         /// <summary>
         /// name of the user. this is how he is being displayed.
         /// </summary>
-        [BsonElement("name")]
+        [BsonElement(NameField)]
         public readonly string Name;
         
         /// <summary>
         /// simple name of this user. usually maps to lowercase-variations from irc. only contains ASCII.
         /// </summary>
-        [BsonElement("simple_name")]
+        [BsonElement(SimpleNameField)]
         public readonly string SimpleName;
 
+        /// <summary>
+        /// current amount of money the user has.
+        /// </summary>
+        [BsonElement(MoneyField)]
+        public readonly int Money;
+
         [BsonConstructor]
-        public User(string id, string providedId, string name, string simpleName, string providedName)
+        public User(string id, string providedId, string name, string simpleName, string providedName, int money)
         {
-            Id = id;
-            ProvidedId = providedId;
-            Name = name;
-            SimpleName = simpleName;
-            ProvidedName = providedName;
+            this.Id = id;
+            this.ProvidedId = providedId;
+            this.Name = name;
+            this.SimpleName = simpleName;
+            this.ProvidedName = providedName;
+            this.Money = money;
         }
     }
 }

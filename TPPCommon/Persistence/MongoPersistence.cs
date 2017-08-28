@@ -90,5 +90,16 @@ namespace TPPCommon.Persistence
             var result = GetCollection<TModel>().Find(expression);
             return result.Any() ? result.Single() : null;
         }
+
+        public TModel FindOneAndModify<TModel>(Expression<Func<TModel, bool>> expression, string updateDefinition) where TModel : Model
+        {
+            var options = new FindOneAndUpdateOptions<TModel>()
+            {
+                IsUpsert = false,
+                ReturnDocument = ReturnDocument.After,
+            };
+
+            return GetCollection<TModel>().FindOneAndUpdate(expression, updateDefinition, options);
+        }
     }
 }

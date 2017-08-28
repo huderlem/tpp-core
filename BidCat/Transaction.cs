@@ -8,37 +8,47 @@ namespace BidCat
     /// <summary>
     /// Model for bank transaction objects.
     /// </summary>
-    [Table("transactions")]
+    [Table(TableName)]
     public class Transaction : Model
     {
+        // Table name.
+        public const string TableName = "transactions";
+
+        // Field names.
+        public const string UserIdField = "user";
+        public const string ChangeField = "change";
+        public const string TimestampField = "timestamp";
+        public const string OldBalanceField = "old_balance";
+        public const string NewBalanceField = "new_balance";
+
         /// <summary>
         /// User id that the (chat) service, which this user originates from, provided.
         /// </summary>
-        [BsonElement("user")]
+        [BsonElement(UserIdField)]
         public readonly string UserId;
 
         /// <summary>
         /// Amount of change in money.
         /// </summary>
-        [BsonElement("change")]
+        [BsonElement(ChangeField)]
         public readonly int Change;
 
         /// <summary>
         /// Time of the transaction.
         /// </summary>
-        [BsonElement("timestamp")]
+        [BsonElement(TimestampField)]
         public readonly DateTime Timestamp;
 
         /// <summary>
         /// Previous money balance, before the transaction.
         /// </summary>
-        [BsonElement("old_balance")]
+        [BsonElement(OldBalanceField)]
         public readonly int OldBalance;
 
         /// <summary>
         /// New money balance, after the transaction.
         /// </summary>
-        [BsonElement("new_balance")]
+        [BsonElement(NewBalanceField)]
         public readonly int NewBalance;
 
         [BsonConstructor]

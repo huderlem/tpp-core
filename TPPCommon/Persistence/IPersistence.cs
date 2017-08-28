@@ -30,5 +30,13 @@ namespace TPPCommon.Persistence
         /// <param name="expression">expression defining what model to match</param>
         /// <returns>The object found, or null if none was found.</returns>
         TModel FindOne<TModel>(Expression<Func<TModel, bool>> expression) where TModel : Model;
+
+        /// <summary>
+        /// Searches for a single model, and modifies the first match.
+        /// </summary>
+        /// <param name="expression">expression defining which model to match</param>
+        /// <param name="updateDefinition">update definition</param>
+        /// <returns>The updated model. If no model was found, returns null.</returns>
+        TModel FindOneAndModify<TModel>(Expression<Func<TModel, bool>> expression, string updateDefinition) where TModel : Model;
     }
 }
